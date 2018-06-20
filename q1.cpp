@@ -1,7 +1,16 @@
 #include <iostream>
 #include <vector>
-
-
+#include <map>
+/*
+// how to get Leetcode tests to run approximately 10-40% faster, since they do a lot of print outs.
+static auto x = [](){
+    // turn off sync
+    std::ios::sync_with_stdio(false);
+    // untie in/out streams
+    std::cin.tie(0);
+    return 0;
+}();
+*/
 class Solution {
 public:
     // 210ms
@@ -42,6 +51,22 @@ public:
             }
         }
     }
+    // 9ms
+    std::vector<int> twoSum3(std::vector<int>& nums, int target) {
+        std::vector<int> result;
+        std::map<int, int> myMap;
+        for(int i = 1; i <= nums.size(); i++){
+            if(myMap[target - nums[i-1]]){
+                result.push_back(myMap[target - nums[i-1]] - 1);
+                result.push_back(i-1);
+                return result;
+            }
+            myMap[nums[i-1]] = i;
+        }
+        for(std::map<int, int>::iterator it = myMap.begin(); it !=myMap.end(); it++){
+            std::cout << it->first << "=>" << it->second << "\n";
+        }
+    }
 };
 
 
@@ -51,7 +76,7 @@ int main(){
 
     int inputs[] = {15, 6, 2, 7, 11, 5};
     std::vector<int> para(inputs, inputs + sizeof(inputs) / sizeof(int));
-    std::vector<int> output = foo.twoSum2(para, 9);
+    std::vector<int> output = foo.twoSum3(para, 9);
 
     for (std::vector<int>::iterator it = output.begin(); it != output.end(); ++it){
         std::cout << ' ' << *it;
