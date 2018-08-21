@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <set>
+#include <unordered_map>
 using namespace std;
 /*
 static auto x = [](){
@@ -12,16 +13,19 @@ return 0;
 }();
 */
 
-void addThree(int a, int b, int c, vector<vector<int>>& vr) {
-	int arr[3] = { a, b, c };
+void addUniqueThree(int a, int b, int c, vector<vector<int>>& vr, unordered_multimap<int, vector<int>>& um) {
+	int arr[3] = {a, b, c};
 	sort(arr, arr + 3);
-	for (int i = 0; i < vr.size(); i++) {
-		if (vr[i][0] == arr[0] && vr[i][1] == arr[1]) {
+	auto range = um.equal_range(arr[0]);
+	for (auto it = range.first; it != range.second; it++) {
+		auto temp = *it;
+		if ((temp.second)[1] == arr[1]) {
 			return;
 		}
 	}
 	vector<int> v(arr, arr + 3);
 	vr.push_back(v);
+	um.insert({arr[0], v});
 }
 class Solution {
 public:
@@ -32,6 +36,7 @@ public:
 	vector<vector<int>> threeSum02(vector<int>& nums) {
 
 		vector<vector<int>> vr;
+		unordered_multimap<int, vector<int>> um;
 		if (nums.size() < 3) { return vr; }
 
 		sort(nums.begin(), nums.end());
@@ -49,7 +54,7 @@ public:
 				if (nums[i] == p2) { continue; }
 				if (nums[start] + nums[i] > 0 && nums[i] >= 0) { break; }
 				if (binary_search(nums.begin() + i + 1, nums.end(), 0 - (nums[start] + nums[i]))) {
-					addThree(nums[start], nums[i], 0 - (nums[start] + nums[i]), vr);
+					addUniqueThree(nums[start], nums[i], 0 - (nums[start] + nums[i]), vr, um);
 				}
 				p2 = nums[i];
 			}
@@ -63,6 +68,7 @@ public:
 	vector<vector<int>> threeSum01(vector<int>& nums) {
 
 		vector<vector<int>> vr;
+		unordered_multimap<int, vector<int>> um;
 		vector<int>::iterator zeroStart, afterZero;
 		sort(nums.begin(), nums.end());
 		zeroStart = lower_bound(nums.begin(), nums.end(), 0);
@@ -74,7 +80,7 @@ public:
 		if (binary_search(nums.begin(), nums.end(), 0)) {
 			for (int i = 0; i < zeroStart - nums.begin(); i++) {
 				if (binary_search(afterZero, nums.end(), nums[i] * (-1))) {
-					addThree(nums[i], 0, nums[i] * (-1), vr);
+					addUniqueThree(nums[i], 0, nums[i] * (-1), vr, um);
 				}
 			}
 		}
@@ -82,18 +88,17 @@ public:
 		for (int i = 0; i < zeroStart - nums.begin(); i++) {
 			for (int j = i + 1; j < zeroStart - nums.begin(); j++) {
 				if (binary_search(afterZero, nums.end(), 0 - nums[i]  - nums[j])) {
-					addThree(nums[i], nums[j], 0 - nums[i] - nums[j], vr);
+					addUniqueThree(nums[i], nums[j], 0 - nums[i] - nums[j], vr, um);
 				}
 			}
 		}
 		for (int i = afterZero - nums.begin(); i < nums.size(); i++) {
 			for (int j = i + 1; j < nums.size(); j++) {
 				if (binary_search(nums.begin(), zeroStart, 0 - nums[i] - nums[j])) {
-					addThree(nums[i], nums[j], 0 - nums[i] - nums[j], vr);
+					addUniqueThree(nums[i], nums[j], 0 - nums[i] - nums[j], vr, um);
 				}
 			}
 		}
-
 
 		return vr;
 	}
